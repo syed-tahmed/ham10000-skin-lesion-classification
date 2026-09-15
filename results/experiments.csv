@@ -1,0 +1,5 @@
+Exp,Model,Changes,Accuracy,Macro F1,mel Recall,df Recall,Result
+1,Baseline CNN,"from scratch, no class weights",0.746,0.411,0.236,0.0,majority-class bias; misses melanoma
+2,Baseline CNN,+ class weights,0.573,0.395,0.624,0.333,mel recall up 2.6x; precision cost
+3,ResNet18,"+ pretrained, lr 1e-4",0.744,0.593,0.655,0.611,all classes improved on both metrics
+4,ResNet18,+ LR scheduler,0.755,0.623,0.636,0.722,best model; smoother convergence
