@@ -30,6 +30,12 @@ This project works through that problem in four controlled experiments, changing
 | vasc | Vascular lesions | 142 | 1.4% |
 | df | Dermatofibroma | 115 | 1.1% |
 
+![Class samples](results/class_samples.png)
+
+Melanoma (`mel`) and benign nevi (`nv`) look strikingly similar — both are small brown lesions on pale skin. This observation during EDA predicted exactly where the model would struggle, and the confusion matrix later confirmed it.
+
+
+
 ### Data leakage
 
 The dataset contains 10,015 images but only 7,470 unique lesions — 2,545 images are repeat photographs of the same lesion. A random split scatters these across train and test, letting the model recognise memorised lesions rather than learn general features.
@@ -45,6 +51,22 @@ Val-Test overlap  : 0
 Split sizes: 6,990 train / 1,509 validation / 1,516 test.
 
 ---
+---
+
+## Preprocessing
+
+Images are resized to 128×128 and cached as uint8 NumPy arrays (~490 MB), removing JPEG decoding from the training loop entirely.
+
+Training uses horizontal and vertical flips, ±20° rotation, and mild colour jitter. Vertical flipping is safe here because dermatoscopic images have no meaningful "up" — unlike photographs of objects or text.
+
+![Augmentation](results/augmentation.png)
+
+The lesion stays clearly recognisable across all variants, which is the test augmentation has to pass: enough variation to prevent memorisation, not so much that diagnostic features are destroyed.
+
+Validation and test sets use deterministic transforms only, so their scores stay comparable across experiments.
+
+
+
 
 ## Experiments
 
@@ -102,6 +124,12 @@ Test scores came out slightly above validation scores, suggesting the model did 
 The dominant error is bidirectional confusion between melanoma and benign nevi: 37 melanomas labelled nevi, 102 nevi labelled melanoma. Visual inspection during EDA had already flagged these two classes as the most similar.
 
 Examining the 37 missed melanomas revealed something more useful: **in 36 of 37 cases, melanoma was the model's second-ranked prediction.** The signal was present; `argmax` discarded it.
+
+![Missed melanomas](results/missed_melanomas.png)
+
+Two failure patterns appear. The first three images — near-identical views of the same lesion, where the model was 98%+ confident it was benign — are genuine failures. The remaining cases show the model hesitating rather than being wrong outright, with melanoma confidence between 0.10 and 0.24. Mean confidence in the wrong label across all 37 was 0.678, which suggests the probabilities carry usable signal even when the argmax does not.
+
+
 
 ### Threshold analysis
 
