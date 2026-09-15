@@ -175,16 +175,28 @@ The model did not change. Only the decision rule did.
 ```
 .
 ├── Deep_Learning_project.ipynb      Full pipeline, EDA to evaluation
+├── src/
+│   └── predict.py                   Single-image inference with triage threshold
 ├── results/
 │   ├── experiments.csv              Experiment comparison table
 │   ├── mel_threshold_sweep.csv      Threshold analysis
+│   ├── class_samples.png            One image per class
+│   ├── augmentation.png             Augmentation examples
+│   ├── missed_melanomas.png         Misclassified melanomas
 │   ├── test_confusion_matrix.png    Final confusion matrix
 │   └── logs/                        Per-experiment JSON records
 ├── LICENSE
 └── README.md
+
+
 ```
 
----
+For single-image inference without running the notebook:
+
+```bash
+python src/predict.py --image path/to/lesion.jpg --model exp4_resnet18_sched.pt
+```
+
 
 ## Reproducing
 
